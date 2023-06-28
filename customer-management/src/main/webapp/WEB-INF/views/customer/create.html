@@ -1,0 +1,126 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Create customer</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<form>-->
+<!--    <div class="row">-->
+<!--        <div class="col-lg-6">-->
+<!--            <label for="fullName">Full Name</label>-->
+<!--            <input type="text" name="fullName" id="fullName">-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="row">-->
+<!--        <div class="col-lg-3">-->
+<!--            <button type="submit">Create</button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</form>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of customer</title>
+    <!--    Ten thu muc/ ten file html :: ten fragment-->
+    <!--    head-css-->
+    <th:block th:replace="layout/head :: head-1"/>
+    <!--    head-css-->
+
+</head>
+<body>
+<!-- Begin page -->
+<div id="wrapper">
+    <!--    header-->
+    <th:block th:replace="layout/header"/>
+    <!--    header-->
+
+    <!--    left-side-->
+    <th:block th:replace="layout/left"/>
+    <!--    left-side-->
+
+
+    <div class="content-page">
+        <div class="content">
+            <!--    page content-->
+            <div class="container-fluid">
+                <!-- start page title -->
+                <h1 class="text-center">Product Management</h1>
+                <!-- end page title -->
+
+                <!--                Start row-->
+                <div class="container justify-center" style="align-items: center;">
+                    <div>
+                        <a href="#" class="btn btn-primary">Back</a>
+                    </div>
+                    <form method="post">
+                        <fieldset>
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        <li>Errors</li>
+                                    </ul>
+                                </div>
+
+                                <div class="alert alert-success text-center">
+                                    <span class="message">Success</span>
+                                </div>
+
+                            <table class="table table-striped table-hover">
+                                <tr>
+                                    <td class="col-2">Name: </td>
+                                    <td><input type="text" name="name" id="name" class="form-control" value="Name"></td>
+                                </tr>
+                                <tr>
+                                    <td>Price </td>
+                                    <td><input type="text" name="price" id="price" class="form-control" value="Price"></td>
+                                </tr>
+                                <tr>
+                                    <td>Quantity: </td>
+                                    <td><input type="text" name="quantity" id="quantity" class="form-control" value="Quantity"></td>
+                                </tr>
+                                <tr>
+                                    <td>Category </td>
+                                    <td>
+                                        <select name="category" class="form-control">
+                                            <option value="Food">Food</option>
+                                            <option value="Water">Water</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Description: </td>
+                                    <td><input type="text" name="description" id="description" class="form-control" value="Description"></td>
+                                </tr>
+                                <tr>
+                                    <td>Img Link: </td>
+                                    <td><input type="text" name="imgLink" id="imgLink" class="form-control" value="Img-Link"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><input type="submit" value="Create Product" class="btn btn-primary"></td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </form>
+                </div>
+                <!--                End row-->
+
+            </div>
+            <!--    page content-->
+        </div>
+    </div>
+
+    <!--    footer-->
+    <th:block th:replace="layout/footer"/>
+    <!--    footer-->
+
+    <!--    footer-javaScript-->
+    <th:block th:replace="layout/footer-js"/>
+    <!--    footer-javaScript-->
+</div>
+</body>
+</html>

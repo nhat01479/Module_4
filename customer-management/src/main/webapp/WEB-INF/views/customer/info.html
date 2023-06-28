@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of customer</title>
+    <!--    Ten thu muc/ ten file html :: ten fragment-->
+    <!--    head-css-->
+    <th:block th:replace="layout/head :: head-1"/>
+    <!--    head-css-->
+
+</head>
+<body>
+<!-- Begin page -->
+<div id="wrapper">
+    <!--    header-->
+    <th:block th:replace="layout/header"/>
+    <!--    header-->
+
+    <!--    left-side-->
+    <th:block th:replace="layout/left"/>
+    <!--    left-side-->
+
+
+    <div class="content-page">
+        <div class="content">
+            <!--    page content-->
+            <div class="container-fluid">
+                <!-- start page title -->
+                <h1 class="text-center">Product Management</h1>
+                <!-- end page title -->
+
+
+                <!--                Start row-->
+
+                <!--                End row-->
+
+            </div>
+            <!--    page content-->
+        </div>
+    </div>
+
+    <!--    footer-->
+    <th:block th:replace="layout/footer"/>
+    <!--    footer-->
+
+    <!--    footer-javaScript-->
+    <th:block th:replace="layout/footer-js"/>
+    <!--    footer-javaScript-->
+</div>
+</body>
+</html>
