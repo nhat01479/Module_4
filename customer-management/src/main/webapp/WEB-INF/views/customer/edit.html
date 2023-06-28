@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create customer</title>
+    <title>Update customer</title>
     <!--    Ten thu muc/ ten file html :: ten fragment-->
     <!--    head-css-->
     <th:block th:replace="layout/head :: head-1"/>
@@ -26,7 +26,7 @@
             <!--    page content-->
             <div class="container-fluid">
                 <!-- start page title -->
-                <h1 class="text-center">Create Customer</h1>
+                <h1 class="text-center">Update Customer</h1>
                 <!-- end page title -->
                 <div class="alert alert-danger">
                     <ul>
@@ -43,20 +43,22 @@
                         <fieldset>
                             <table class="table table-striped table-hover">
                                 <tr>
-                                    <td class="col-2">Full Name: </td>
-                                    <td><input type="text" name="fullName" id="fullName" class="form-control"></td>
+                                    <td>Full Name:</td>
+                                    <td><input type="text" class="form-control" name="fullName" id="fullName" th:value="${customer.fullName}"></td>
+<!--                                    Có thể dùng th:field="*{fullName}" và không cần để trường name="fullName"-->
+<!--                                    <td><input type="text" class="form-control" id="fullName" th:field="*{fullName}"></td>-->
                                 </tr>
                                 <tr>
-                                    <td>Email: </td>
-                                    <td><input type="text" name="email" id="email" class="form-control"></td>
+                                    <td>Email:</td>
+                                    <td><input type="text" class="form-control" name="email" id="email" th:value="${customer.email}"></td>
                                 </tr>
                                 <tr>
-                                    <td>Phone: </td>
-                                    <td><input type="tel" name="phone" id="phone" class="form-control"></td>
+                                    <td>Phone:</td>
+                                    <td><input type="tel" class="form-control" name="phone" id="phone" th:value="${customer.phone}"></td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><input type="submit" value="Create" class="btn btn-primary"></td>
+                                    <td><input type="submit" value="Update" class="btn btn-primary"></td>
                                 </tr>
                             </table>
                         </fieldset>
