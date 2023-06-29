@@ -141,9 +141,11 @@ BEGIN
 END //
 delimiter ;
 
-
 -- view --
-create view transferHistory as
-select sender_id, recipient_id, fees, fees_amount, transfer_amount, created_at 
-from `transfers`;
-select * from transferHistory;
+create view transfers_history as
+SELECT tf.sender_id, c.full_name as NguoiGui, tf.recipient_id, cc.full_name as NguoiNhan, tf.fees, tf.fees_amount, tf.transfer_amount, tf.created_at 
+FROM transfers tf
+JOIN customers c ON tf.sender_id = c.id
+JOIN customers cc ON tf.recipient_id = cc.id;
+
+select * from transfers_history;
