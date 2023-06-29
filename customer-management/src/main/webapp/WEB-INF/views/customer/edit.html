@@ -44,17 +44,17 @@
                             <table class="table table-striped table-hover">
                                 <tr>
                                     <td>Full Name:</td>
-                                    <td><input type="text" class="form-control" name="fullName" id="fullName" th:value="${customer.fullName}"></td>
+                                    <td><input type="text" class="form-control" name="fullName" id="fullName" th:value="${customer.fullName}" required></td>
 <!--                                    Có thể dùng th:field="*{fullName}" và không cần để trường name="fullName"-->
 <!--                                    <td><input type="text" class="form-control" id="fullName" th:field="*{fullName}"></td>-->
                                 </tr>
                                 <tr>
                                     <td>Email:</td>
-                                    <td><input type="text" class="form-control" name="email" id="email" th:value="${customer.email}"></td>
+                                    <td><input type="text" class="form-control" name="email" id="email" th:value="${customer.email}" required></td>
                                 </tr>
                                 <tr>
                                     <td>Phone:</td>
-                                    <td><input type="tel" class="form-control" name="phone" id="phone" th:value="${customer.phone}"></td>
+                                    <td><input type="tel" class="form-control" name="phone" id="phone" th:value="${customer.phone}" required></td>
                                 </tr>
                                 <tr>
                                     <td></td>
