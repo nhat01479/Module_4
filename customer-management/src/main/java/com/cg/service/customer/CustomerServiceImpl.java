@@ -7,7 +7,15 @@ import java.util.List;
 
 public class CustomerServiceImpl implements ICustomerService{
     public static List<Customer> customers = new ArrayList<>();
+
     public static Long maxId = 1L;
+
+    static {
+        customers.add(new Customer(maxId++, "Hamish Duran", "nipen@mailinator.com", "+1 (155) 686-5675"));
+        customers.add(new Customer(maxId++, "Micah Henderson", "gyluse@mailinator.com", "+1 (658) 535-6023"));
+        customers.add(new Customer(maxId++, "John Doe", "xadywyv@mailinator.com", "+1 (658) 535-6023"));
+        customers.add(new Customer(maxId++, "Keaton Ramos", "kazefozy@mailinator.com", "+1 (328) 485-8848"));
+    }
 
     @Override
     public List<Customer> getAll() {
