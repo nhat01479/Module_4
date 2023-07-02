@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transfer</title>
+    <link rel="stylesheet" href="/assets/bootstrap/v5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/fontawesome/v5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+</head>
+<body>
+<div class="container">
+    <header class="row">
+        <div class="col-lg-6">
+            <h3>Transfer money Infomation</h3>
+        </div>
+        <div class="col-lg-6 header-right-button">
+
+            <a href="/customers">
+                <button class="btn btn-outline-light">
+                    <i class="fas fa-list-ul"></i>
+                    List of customers
+                </button>
+            </a>
+
+        </div>
+    </header>
+
+    <div class="content">
+        <form method="post" th:object="${transfer}">
+            <div class="row mb-3">
+                <div class="col-lg-3">
+                    <label class="fw-bold">Sender ID</label>
+                    <input type="number"  class="form-control" th:field="*{sender.id}" readonly>
+                </div>
+                <div class="col-lg-3">
+                    <label class="fw-bold">Sender Name</label>
+                    <input type="text" class="form-control" th:field="*{sender.fullName}" readonly>
+                </div>
+                <div class="col-lg-3">
+                    <label class="fw-bold">Email </label>
+                    <input type="email" class="form-control" th:field="*{sender.email}" required>
+                </div>
+                <div class="col-lg-3">
+                    <label class="fw-bold">Sender balance ($)</label>
+                    <input type="tel"  class="form-control" th:field="*{sender.balance}" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-3">
+                    <label class="fw-bold">Recipient Name</label>
+
+                    <select class="form-select" name="recipient.id">
+                        <th:block th:each="item : ${recipients}">
+                                    <option th:if="${item.id != transfer.sender.id}" th:value="${item.id}" class="form-control">
+                                        (<span th:text="${item.id}"></span>)
+                                        <span th:text="${item.fullName}"></span>
+                                    </option>
+                        </th:block>
+                    </select>
+
+                </div>
+                <div class="col-lg-3">
+                    <label class="fw-bold">Transfer amount</label>
+                    <input type="number" name="transferAmount" class="form-control" oninput="handleTotalAmountTransaction(this)" required>
+                </div>
+                <div class="col-lg-3">
+                    <label class="fw-bold">Fees (%)</label>
+                    <input type="tel" name="fees" id="fees" class="form-control" th:field="*{fees}" readonly>
+                </div>
+                <div class="col-lg-3">
+                    <label class="fw-bold">Total amount of transaction ($)</label>
+                    <input type="tel" name="transactionAmount" id="transactionAmount" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-3">
+                    <button type=submit class="btn btn-outline-primary">
+                        <i class="fas fa-exchange-alt"></i>
+                        Transfer
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+    <th:block th:replace="layout/footer"/>
+</div>
+<script>
+    function handleTotalAmountTransaction(element) {
+        let transferAmount = Number(element.value);
+        let fees = Number(document.getElementById("fees").value);
+        let feesAmount = fees * transferAmount * 0.01;
+        document.getElementById("transactionAmount").value = transferAmount + feesAmount;
+    }
+</script>
+</body>
+</html>

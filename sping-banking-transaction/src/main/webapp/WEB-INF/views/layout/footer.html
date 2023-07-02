@@ -1,0 +1,5 @@
+<footer>
+    <div class="my-alert" th:if="${success} or ${error}">
+        <h3 th:text="${message}" th:class="${success} ? 'alert alert-success mb-0' : 'alert alert-danger mb-0'"></h3>
+    </div>
+</footer>

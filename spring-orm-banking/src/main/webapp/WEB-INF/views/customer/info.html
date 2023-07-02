@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer's Infomation</title>
+    <!--    Ten thu muc/ ten file html :: ten fragment-->
+    <!--    head-css-->
+    <th:block th:replace="layout/head :: head-1"/>
+    <!--    head-css-->
+
+</head>
+<body>
+<!-- Begin page -->
+<div id="wrapper">
+    <!--    header-->
+    <th:block th:replace="layout/header"/>
+    <!--    header-->
+
+    <!--    left-side-->
+    <th:block th:replace="layout/left"/>
+    <!--    left-side-->
+
+
+    <div class="content-page">
+        <div class="content">
+            <!--    page content-->
+            <div class="container-fluid">
+                <!-- start page title -->
+                <h1 class="text-center">Customer's Infomation</h1>
+                <!-- end page title -->
+
+
+                <!--                Start row-->
+                    <div class="container">
+                        <table th:object="${customer}" class="table table-striped table-hover">
+<!--                            th:text="*{id}": dấu * sẽ đi với thuộc tính của đối tượng-->
+<!--                            th:text="${customer.fullName}": dấu $ sẽ đi với đối tượng-->
+                            <tr>
+                                <td class="col-2">ID</td>
+                                <td th:text="*{id}"></td>
+                            </tr>
+                            <tr>
+                                <td>Full Name</td>
+                                <td th:text="${customer.fullName}"></td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td th:text="*{email}"></td>
+                            </tr>
+                            <tr>
+                                <td>Phone</td>
+                                <td th:text="*{phone}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                <!--                End row-->
+
+            </div>
+            <!--    page content-->
+        </div>
+    </div>
+
+    <!--    footer-->
+    <th:block th:replace="layout/footer"/>
+    <!--    footer-->
+
+    <!--    footer-javaScript-->
+    <th:block th:replace="layout/footer-js"/>
+    <!--    footer-javaScript-->
+</div>
+</body>
+</html>
