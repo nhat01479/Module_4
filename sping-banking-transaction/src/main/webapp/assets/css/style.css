@@ -13,6 +13,7 @@ header {
     gap: 10px;
 }
 .content table thead tr th{
+    text-align: center;
     background-color: green;
     color: #fff;
 }

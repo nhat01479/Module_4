@@ -16,7 +16,7 @@ public class TransferServiceImpl implements ITransferService{
     private TransferRepository transferRepository;
     @Override
     public List<Transfer> findAll() {
-        return null;
+        return transferRepository.findAll();
     }
 
     @Override

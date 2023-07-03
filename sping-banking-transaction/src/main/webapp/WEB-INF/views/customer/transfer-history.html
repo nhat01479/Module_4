@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of customers</title>
+    <link rel="stylesheet" href="/assets/bootstrap/v5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/fontawesome/v5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="col-lg-6">
+            <h1>Transfer's history </h1>
+        </div>
+        <div class="col-lg-6 header-right-button">
+            <a href="/customers">
+                <button class="btn btn-outline-light">
+                    <i class="fas fa-list-ul"></i>
+                    List of customers
+                </button>
+            </a>
+
+        </div>
+    </header>
+
+    <div class="content">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Sender ID</th>
+                <th>Sender Name</th>
+                <th>Recipient ID</th>
+                <th>Recipient Name</th>
+                <th>Fees</th>
+                <th>Fees Amount</th>
+                <th>Transfer Amount</th>
+                <th>Transaction Amount</th>
+                <th colspan="2">Create at</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item: ${transfers}">
+                    <td th:text="${item.id}"></td>
+                    <td th:text="${item.sender.id}"></td>
+                    <td th:text="${item.sender.fullName}"></td>
+                    <td th:text="${item.recipient.id}"></td>
+                    <td th:text="${item.recipient.fullName}"></td>
+                    <td th:text="${item.fees}"></td>
+                    <td th:text="${item.feesAmount}"></td>
+                    <td th:text="${item.transferAmount}"></td>
+                    <td th:text="${item.transactionAmount}"></td>
+                    <td th:text="${item.createdAt}"></td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <th:block th:replace="layout/footer"/>
+</div>
+
+
+</body>
+</html>

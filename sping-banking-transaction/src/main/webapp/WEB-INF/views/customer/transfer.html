@@ -27,7 +27,7 @@
     </header>
 
     <div class="content">
-        <form method="post" th:object="${transfer}">
+        <form method="post" th:if="${transfer != null}" th:object="${transfer}">
             <div class="row mb-3">
                 <div class="col-lg-3">
                     <label class="fw-bold">Sender ID</label>
@@ -52,7 +52,8 @@
 
                     <select class="form-select" name="recipient.id">
                         <th:block th:each="item : ${recipients}">
-                                    <option th:if="${item.id != transfer.sender.id}" th:value="${item.id}" class="form-control">
+                                    <option th:selected="${item.id == currentRecipient}"
+                                            th:if="${item.id != transfer.sender.id}" th:value="${item.id}" class="form-control">
                                         (<span th:text="${item.id}"></span>)
                                         <span th:text="${item.fullName}"></span>
                                     </option>
@@ -84,9 +85,9 @@
         </form>
 
     </div>
-
-    <th:block th:replace="layout/footer"/>
 </div>
+    <th:block th:replace="layout/footer"/>
+
 <script>
     function handleTotalAmountTransaction(element) {
         let transferAmount = Number(element.value);

@@ -79,17 +79,21 @@ public class CustomerController {
         if (customerOptional.isEmpty()) {
             model.addAttribute("error", true);
             model.addAttribute("message", "Không tìm thấy");
-        } else {
 
+        } else {
+            Customer c = customerOptional.get();
             customer.setId(id);
+            customer.setBalance(c.getBalance());
             customerService.save(customer);
             model.addAttribute("customer", customer);
 
             model.addAttribute("success", true);
             model.addAttribute("message", "Cập nhật thành công");
-        }
 
+        }
         return "/customer/edit";
+
+
     }
 
     @GetMapping("/delete/{id}")
@@ -236,7 +240,7 @@ public class CustomerController {
     }
 
     @PostMapping("/transfer/{senderId}")
-    public String doTransfer(@PathVariable Long senderId, Model model, @ModelAttribute Transfer transfer){
+    public String doTransfer(@PathVariable Long senderId, Model model,@RequestParam ("recipient.id") Long recipientId ,@ModelAttribute Transfer transfer){
 
         Optional<Customer> senderOptional = customerService.findById(senderId);
         List<Customer> recipients = customerService.findAll();
@@ -273,6 +277,7 @@ public class CustomerController {
         BigDecimal transactionAmount = transferAmount.add(feesAmount) ;
 
         if (currentBalance.compareTo(transactionAmount) < 0) {
+            model.addAttribute("currentRecipient", recipientId);
             model.addAttribute("error", true);
             model.addAttribute("message", "Số dư không đủ");
             return "/customer/transfer";
@@ -296,9 +301,18 @@ public class CustomerController {
         transferService.save(transfer);
         model.addAttribute("transfer", transfer);
 
+        model.addAttribute("currentRecipient", recipientId);
         model.addAttribute("success", true);
         model.addAttribute("message", "Chuyển thành công " + transferAmount + " $ vào tài khoản " + recipient.getFullName());
 
         return "/customer/transfer";
+    }
+    @GetMapping("/transfer-history")
+    public String showHistoryTransferPage(Model model){
+        List<Transfer> transfers = transferService.findAll();
+
+        model.addAttribute("transfers", transfers);
+
+        return "customer/transfer-history";
     }
 }
