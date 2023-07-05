@@ -1,13 +1,15 @@
 package com.cg.model;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
 @Transactional
-public class Transfer extends  BaseEntity{
+public class Transfer extends BaseEntity implements Validator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +38,7 @@ public class Transfer extends  BaseEntity{
         this.feesAmount = feesAmount;
         this.transactionAmount = transactionAmount;
     }
+
 
     public Long getId() {
         return id;
@@ -92,4 +95,30 @@ public class Transfer extends  BaseEntity{
     public void setTransactionAmount(BigDecimal transactionAmount) {
         this.transactionAmount = transactionAmount;
     }
+
+    @Override
+    public boolean supports(Class<?> aClass) {
+        return Transfer.class.isAssignableFrom(aClass);
+    }
+    @Override
+    public void validate(Object target, Errors errors) {
+
+            Transfer transfer = (Transfer) target;
+
+            BigDecimal transferAmount = transfer.getTransferAmount();
+
+            if (transferAmount == null) {
+                errors.rejectValue("transferAmount", "transfer.zero");
+            } else {
+                if (transferAmount.compareTo(BigDecimal.valueOf(0)) <= 0) {
+                    errors.rejectValue("transferAmount", "transfer.min");
+                } else {
+                    if (transferAmount.compareTo(BigDecimal.valueOf(500000000)) > 0) {
+                        errors.rejectValue("transferAmount", "transfer.max");
+                    }
+                }
+            }
+
+    }
+
 }

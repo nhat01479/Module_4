@@ -39,7 +39,7 @@
                 </div>
                 <div class="col-lg-3">
                     <label class="fw-bold">Email </label>
-                    <input type="email" class="form-control" th:field="*{sender.email}" required>
+                    <input type="email" class="form-control" th:field="*{sender.email}" >
                 </div>
                 <div class="col-lg-3">
                     <label class="fw-bold">Sender balance ($)</label>
@@ -53,7 +53,7 @@
                     <select class="form-select" name="recipient.id">
                         <th:block th:each="item : ${recipients}">
                                     <option th:selected="${item.id == currentRecipient}"
-                                            th:if="${item.id != transfer.sender.id}" th:value="${item.id}" class="form-control">
+                                            th:value="${item.id}" class="form-control">
                                         (<span th:text="${item.id}"></span>)
                                         <span th:text="${item.fullName}"></span>
                                     </option>
@@ -63,7 +63,7 @@
                 </div>
                 <div class="col-lg-3">
                     <label class="fw-bold">Transfer amount</label>
-                    <input type="number" name="transferAmount" class="form-control" oninput="handleTotalAmountTransaction(this)" required>
+                    <input type="text" name="transferAmount" class="form-control" oninput="handleTotalAmountTransaction(this)" >
                 </div>
                 <div class="col-lg-3">
                     <label class="fw-bold">Fees (%)</label>
