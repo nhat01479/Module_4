@@ -92,9 +92,11 @@
                                                                        class="btn btn-primary btn-sm"><i class="bi bi-eye-fill"></i></a>
                                                                     <a th:href="@{/customers/__${item.id}__}"
                                                                        class="btn btn-primary btn-sm"><i class="fa-solid fa-pen"></i></a>
+<!--                                                                    <form action="@{/customers/delete/__${item.id}__}">-->
+<!--                                                                        <input type="submit" onclick="return confirm('Bạn chắn chắn muốn xoá?')">-->
+<!--                                                                    </form>-->
                                                                     <a th:href="@{/customers/delete/__${item.id}__}" onclick="return confirm('Bạn chắn chắn muốn xoá?')"
                                                                        class="btn btn-lighten-danger btn-sm"><i class="fa-solid fa-trash-can"></i></a>
-
                                                                 </div>
                                                             </td>
                                                         </tr>

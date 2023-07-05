@@ -1,6 +1,5 @@
-body {
-    background-color: red;
-    color: white;
+table th {
+    text-align: center;
 }
 .header {
     position: fixed;

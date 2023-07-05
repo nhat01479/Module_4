@@ -68,6 +68,7 @@
                                                         <th>Name</th>
                                                         <th>Email</th>
                                                         <th>Phone </th>
+                                                        <th>Balance </th>
                                                         <th style="width: 60px;">Action</th>
                                                     </tr>
                                                 </thead>
@@ -79,17 +80,17 @@
                                                         <td th:text="${item.fullName}"></td>
                                                         <td th:text="${item.email}"></td>
                                                         <td th:text="${item.phone}"></td>
+                                                        <td th:text="${item.balance}"></td>
                                                         <td>
                                                             <div class="d-flex justify-content-around">
-<!--                                                                    Nếu dùng (@RequestParam Long id, Model model) thì info?id=${item.id}-->
-<!--                                                                    <a th:href="@{/customers/info?id=__${item.id}__}">Info</a>-->
-<!--                                                                    Nhớ chú ý @{...} cả lỗi-->
-                                                                <a th:href="@{/customers/info/__${item.id}__}"
-                                                                   class="btn btn-primary btn-sm"><i class="bi bi-eye-fill"></i></a>
-                                                                <a th:href="@{/customers/__${item.id}__}"
-                                                                   class="btn btn-primary btn-sm"><i class="fa-solid fa-pen"></i></a>
+
+                                                                <a th:href="@{/customers/__${item.id}__}"  class="btn btn-outline-success"><i class="bi bi-pencil-square"></i></a>
+                                                                <a href="" class="btn btn-outline-success"><i class="bi bi-plus-circle"></i></a>
+                                                                <a href="" class="btn btn-outline-success"><i class="fa-solid fa-minus"></i></a>
+                                                                <a href="" class="btn btn-outline-success"><i class="fa-solid fa-arrow-right-arrow-left"></i></a>
                                                                 <a th:href="@{/customers/delete/__${item.id}__}" onclick="return confirm('Bạn chắn chắn muốn xoá?')"
-                                                                   class="btn btn-lighten-danger btn-sm"><i class="fa-solid fa-trash-can"></i></a>
+                                                                   class="btn btn-outline-success"><i class="fa-solid fa-ban" style="color: #ff0000;"></i></a>
+
                                                             </div>
                                                         </td>
                                                     </tr>

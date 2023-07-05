@@ -49,7 +49,7 @@ public class CustomerController {
         ICustomerService customerService = new CustomerServiceImpl();
         //"add" của đối tượng customerService sẽ thêm khách hàng mới trực tiếp vào danh sách khách hàng trong lớp CustomerServiceImpl
         customerService.add(customer);
-
+        model.addAttribute("customer", new Customer());
         return "customer/create";
         /*
         Ở đây sẽ add customer vào danh sách customers, không ảnh hưởng tới danh sách trong lớp
@@ -125,7 +125,7 @@ public class CustomerController {
             }
             model.addAttribute("customers", customers);
 
-            return "customer/list";
+            return "redirect:/customers";
 
         } catch (Exception e) {
             return "error/404";

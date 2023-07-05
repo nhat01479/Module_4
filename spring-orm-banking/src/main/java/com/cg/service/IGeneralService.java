@@ -1,7 +1,5 @@
 package com.cg.service;
 
-import com.cg.model.Customer;
-
 import java.util.List;
 import java.util.Optional;
 

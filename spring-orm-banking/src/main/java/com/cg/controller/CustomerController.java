@@ -1,7 +1,6 @@
 package com.cg.controller;
 
 import com.cg.model.Customer;
-import com.cg.service.customer.CustomerServiceImpl;
 import com.cg.service.customer.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

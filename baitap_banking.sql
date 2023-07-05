@@ -149,3 +149,5 @@ JOIN customers c ON tf.sender_id = c.id
 JOIN customers cc ON tf.recipient_id = cc.id;
 
 select * from transfers_history;
+
+
