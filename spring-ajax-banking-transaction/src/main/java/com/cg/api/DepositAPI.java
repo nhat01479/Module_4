@@ -32,7 +32,7 @@ public class DepositAPI {
 
     @PostMapping("/{customerId}")
     public ResponseEntity<?> deposit(@PathVariable("customerId") String customerIdStr, @RequestBody DepositCreReqDTO depositCreReqDTO, BindingResult bindingResult) {
-
+        Map<String, String> data = new HashMap<>();
         new DepositCreReqDTO().validate(depositCreReqDTO, bindingResult);
 
         if (bindingResult.hasFieldErrors()) {
@@ -40,7 +40,6 @@ public class DepositAPI {
         }
 
         if (!validateUtils.isNumberValid(customerIdStr)) {
-            Map<String, String> data = new HashMap<>();
             data.put("message", "Mã khách hàng không hợp lệ");
             return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
         }
@@ -50,7 +49,6 @@ public class DepositAPI {
         Optional<Customer> customerOptional = customerService.findById(customerId);
 
         if (customerOptional.isEmpty()) {
-            Map<String, String> data = new HashMap<>();
             data.put("message", "Mã khách hàng không tồn tại");
             return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
         }

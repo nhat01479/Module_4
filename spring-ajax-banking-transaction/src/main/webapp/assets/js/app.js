@@ -6,6 +6,7 @@ class App {
   static API_CUSTOMER = this.API_SERVER + '/customers';
   static API_DEPOSIT = this.API_SERVER + '/deposits';
   static API_WITHDRAW = this.API_SERVER + '/withdraws';
+  static API_TRANSFER = this.API_SERVER + "/transfers";
 
   static showDeleteConfirmDialog() {
     return Swal.fire({

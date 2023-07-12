@@ -12,7 +12,7 @@
                         <div class="row mb-3">
                             <div class="col-lg-3">
                                 <label class="fw-bold">Sender ID</label>
-                                <input type="number"  class="form-control" id="senderId" readonly>
+                                <input type="number"  class="form-control" id="senderId" name="senderId" readonly>
                             </div>
                             <div class="col-lg-3">
                                 <label class="fw-bold">Sender Name</label>
@@ -31,13 +31,14 @@
                             <div class="col-lg-3">
                                 <label class="fw-bold">Recipient Name</label>
 
-                                <select class="form-select" id="recipientId">
+                                <select class="form-select" id="recipientId" name="recipientId">
                                 </select>
                                 <div id="transfer-name-error" style="color: red;" ></div>
                             </div>
                             <div class="col-lg-3">
                                 <label class="fw-bold">Transfer amount</label>
-                                <input type="text" id="transferAmount" class="form-control" onchange="handleTotalAmountTransaction(this)" >
+                                <input type="text" id="transferAmount" name="transferAmount" class="form-control"
+                                       onchange="handleTotalAmountTransaction(this)" >
                                 <div id="transfer-error" style="color: red;" ></div>
                             </div>
                             <div class="col-lg-3">

@@ -76,6 +76,7 @@
             updateBalance: App.API_CUSTOMER,
             deposit: App.API_DEPOSIT,
             withdraw: App.API_WITHDRAW,
+            transfer: App.API_TRANSFER,
             getRecipients: App.API_CUSTOMER + '?deleted=0' + '&id_ne=',
             deleteCustomer: App.API_CUSTOMER,
         },
@@ -162,10 +163,12 @@
     page.dialogs.elements.senderBalance = $('#senderBalance');
     page.dialogs.elements.transferAmount = $('#transferAmount');
     page.dialogs.elements.fees = $('#fees');
+    page.dialogs.elements.recipients = $("#recipientId");
+
     page.dialogs.elements.btnTransfer = $('#btnTransfer');
 
     page.commands.renderCustomer = (obj) => {
-        return  `
+        return `
             <tr id="tr_${obj.id}">
                 <td>${obj.id} </td>
                 <td>${obj.fullName} </td>
@@ -212,18 +215,34 @@
             })
     }
     page.commands.getCustomerById = (id) => {
-        return $.ajax ({
+        return $.ajax({
             type: 'GET',
             url: page.url.getCustomerById + '/' + id,
         });
     }
+    page.commands.getRecipients = (customerId) => {
+        $.ajax({
+            type: 'GET',
+            url: page.url.getRecipients + customerId,
 
+        })
+            .done((data) => {
+                page.dialogs.elements.recipients.empty();
+                $("<option>").val("-1").text('--- Chọn người nhận ---').appendTo("#recipientId");
+                data.forEach((item) => {
+                    $("<option>").val(item.id).text('(' + item.id + ') ' + item.fullName).appendTo("#recipientId");
+                });
+            })
+            .fail((error) => {
+                console.log(error);
+            })
 
+    }
 
 
     page.commands.handleAddEventShowModalUpdate = (customerId) => {
 
-        page.commands.getCustomerById(customerId).then((data) =>{
+        page.commands.getCustomerById(customerId).then((data) => {
 
             page.dialogs.elements.fullNameUpdate.val(data.fullName);
             page.dialogs.elements.emailUpdate.val(data.email);
@@ -312,7 +331,7 @@
         $.ajax({
             headers: {
                 'accept': 'application/json',
-                'content-type':  'application/json'
+                'content-type': 'application/json'
             },
             type: "POST",
             url: page.url.createCustomer,
@@ -344,9 +363,9 @@
             });
     }
     page.dialogs.commands.update = () => {
-        const fullName =  page.dialogs.elements.fullNameUpdate.val();
-        const email =  page.dialogs.elements.emailUpdate.val();
-        const phone =  page.dialogs.elements.phoneUpdate.val();
+        const fullName = page.dialogs.elements.fullNameUpdate.val();
+        const email = page.dialogs.elements.emailUpdate.val();
+        const phone = page.dialogs.elements.phoneUpdate.val();
         const address = page.dialogs.elements.addressUpdate.val();
 
         customer.fullName = fullName;
@@ -410,30 +429,11 @@
         })
             .done((data) => {
 
-                $.ajax({
-                    headers: {
-                        'accept': 'application/json',
-                        'content-type': 'application/json'
-                    },
-                    type: 'PATCH',
-                    url: page.url.updateBalance + '/' + customerId,
-                    data: JSON.stringify(customer)
-                })
-                    .done((data) => {
+                const str = page.commands.renderCustomer(data);
+                const currentRow = $('#tr_' + customerId);
+                currentRow.replaceWith(str);
 
-                        const str = page.commands.renderCustomer(data);
-                        const currentRow = $('#tr_' + customerId);
-                        currentRow.replaceWith(str);
-
-
-                        page.dialogs.elements.balanceDeposit.val(newBalance);
-
-                        // page.dialogs.elements.modalDeposit.modal('hide');
-
-                    })
-                    .fail((error) => {
-                        console.log(error);
-                    })
+                page.dialogs.elements.balanceDeposit.val(newBalance);
 
                 App.showSuccessAlert('Nạp tiền thành công');
             })
@@ -451,7 +451,6 @@
 
                 console.log(jqXHR);
             })
-
 
 
     }
@@ -474,29 +473,12 @@
             data: JSON.stringify(obj)
         })
             .done((data) => {
-                $.ajax({
-                    headers: {
-                        'accept': 'application/json',
-                        'content-type': 'application/json'
-                    },
-                    type: 'PATCH',
-                    url: page.url.updateBalance + '/' + customerId,
-                    data: JSON.stringify(customer)
-                })
-                    .done((data) => {
 
-                        const str = page.commands.renderCustomer(data);
-                        const currentRow = $('#tr_' + customerId);
-                        currentRow.replaceWith(str);
+                const str = page.commands.renderCustomer(data);
+                const currentRow = $('#tr_' + customerId);
+                currentRow.replaceWith(str);
 
-                        page.dialogs.elements.balanceWithdraw.val(newBalance);
-
-                        // page.dialogs.elements.modalWithdraw.modal('hide');
-
-                    })
-                    .fail((error) => {
-                        console.log(error);
-                    })
+                page.dialogs.elements.balanceWithdraw.val(newBalance);
 
                 App.showSuccessAlert('Rút tiền thành công');
 
@@ -517,123 +499,53 @@
             })
 
 
-
-
-
     }
     page.dialogs.commands.transfer = () => {
-        page.commands.getCustomerById(customerId).then((data) => {
-            let sender = data;
-            let senderBalance = sender.balance;
-            const transferAmount = +$('#transferAmount').val();
-            const fees = 10;
-            const feesAmount = transferAmount * fees / 100;
-            const transactionAmount = transferAmount + feesAmount;
-            const senderNewBalance = senderBalance - transactionAmount;
+            const transferAmount = page.dialogs.elements.transferAmount.val();
+            const recipientId = page.dialogs.elements.recipients.val();
 
-
-            const recipientId = +$("#recipientId").val();
-            console.log(recipientId);
-            page.commands.getCustomerById(recipientId).then((data) => {
-                let recipient = data;
-                const recipientBalance = recipient.balance;
-                const recipientNewBalance = recipientBalance + transferAmount;
-
-                if (sender.id === recipient.id) {
-                    $("#transfer-name-error").text("Người nhận không hợp lệ");
-                } else {
-
-                    if (!isNaN(transferAmount)) {
-                        if (transferAmount <= 0) {
-                            $("#transfer-error").text("Số tiền phải > 0");
-                        } else {
-
-                            if (transactionAmount > 500000000) {
-                                $("#transfer-error").text("Số tiền giao dịch tối đa 500.000.000");
-                            } else {
-                                if (transactionAmount > sender.balance) {
-                                    $("#transfer-error").text("Số dư không đủ để thực hiện giao dịch");
-                                } else {
-
-                                    sender.balance = senderNewBalance;
-                                    recipient.balance = recipientNewBalance;
-
-                                    transfer = {
-                                        senderId: sender.id,
-                                        recipientId: recipient.id,
-                                        fees,
-                                        transferAmount,
-                                        feesAmount,
-                                        transactionAmount
-                                    }
-
-                                    $.ajax({
-                                        headers: {
-                                            'accept': 'application/json',
-                                            'content-type': 'application/json'
-                                        },
-                                        type: 'PATCH',
-                                        url: page.url.updateBalance + '/' + recipient.id,
-                                        data: JSON.stringify(recipient)
-                                    })
-                                        .done((data) => {
-                                            const str = page.commands.renderCustomer(data);
-                                            const currentRow = $('#tr_' + recipient.id);
-                                            currentRow.replaceWith(str);
-                                        })
-                                        .fail((error) => {
-                                            console.log(error);
-                                        })
-
-                                    $.ajax({
-                                        headers: {
-                                            'accept': 'application/json',
-                                            'content-type': 'application/json'
-                                        },
-                                        type: 'PATCH',
-                                        url: page.url.updateBalance + '/' + sender.id,
-                                        data: JSON.stringify(sender)
-                                    })
-                                        .done((data) => {
-                                            const str = page.commands.renderCustomer(data);
-                                            const currentRow = $('#tr_' + sender.id);
-                                            currentRow.replaceWith(str);
-
-                                            $("#senderBalance").val(senderNewBalance);
-                                            $("#transfer-error").text("");
-                                            $("#transfer-name-error").text("");
-
-
-                                            page.dialogs.elements.modalTransfer.modal('hide');
-
-                                            App.showSuccessAlert('Chuyển tiền thành công');
-                                        })
-                                        .fail((error) => {
-                                            console.log(error);
-                                        })
-
-                                    $.ajax({
-                                        type: 'POST',
-                                        headers: {
-                                            'accept': 'application/json',
-                                            'content-type': 'application/json'
-                                        },
-                                        url: 'http://localhost:3000/transfers',
-                                        data: JSON.stringify(transfer)
-                                    })
-                                }
-
-                            }
-                        }
-
-                    } else {
-                        $("#transfer-error").text("Sai định dạng");
-                    }
+                const obj = {
+                    senderId: customerId,
+                    recipientId: recipientId,
+                    transferAmount,
                 }
-            });
-        })
 
+            $.ajax({
+                type: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    'content-type': 'application/json'
+                },
+                url: page.url.transfer + '/'  + customerId,
+                data: JSON.stringify(obj)
+            })
+                .done((data) => {
+                    for (let i = 0; i < data.length; i++) {
+                        let str = page.commands.renderCustomer(data[i]);
+                        let currentRow = $('#tr_' + data[i].id);
+                        currentRow.replaceWith(str);
+                    }
 
+                    // $("#senderBalance").val(senderNewBalance);
+
+                    page.dialogs.elements.modalTransfer.modal('hide');
+
+                    App.showSuccessAlert('Chuyển tiền thành công');
+                })
+                .fail((jqXHR) => {
+                    const responseJSON = jqXHR.responseJSON;
+
+                    page.dialogs.elements.errorAreaTransfer.empty();
+                    let str = '';
+
+                    $.each(responseJSON, (k, v) => {
+                        str += `<label for="${k}Transfer">${v}</label>`
+                    })
+
+                    page.dialogs.elements.errorAreaTransfer.append(str).removeClass('hide').addClass('show');
+
+                    console.log(jqXHR);
+                })
     }
 
     page.initializeControlEvent = () => {
@@ -672,7 +584,7 @@
 
         /** Update */
 
-        page.dialogs.elements.btnUpdate.on('click', ()  => {
+        page.dialogs.elements.btnUpdate.on('click', () => {
             page.dialogs.elements.formUpdate.trigger("submit");
         })
 
@@ -690,7 +602,6 @@
         /** Transfer */
 
         page.dialogs.elements.btnTransfer.on('click', () => {
-
             page.dialogs.elements.formTransfer.trigger("submit");
         })
 
@@ -701,7 +612,6 @@
         })
 
     }
-
 
     page.loadData = () => {
         page.commands.getAllCustomers();
@@ -716,6 +626,7 @@
             emailCreate: {
                 required: true,
                 maxlength: 30,
+                email:true,
             }
         },
         messages: {
@@ -724,14 +635,14 @@
             },
             emailCreate: {
                 required: 'Email là bắt buộc',
-                maxlength: 'Email tối đa 30 ký tự'
+
             }
         },
         errorLabelContainer: "#modalCreate .error-area",
         errorPlacement: function (error, element) {
             error.appendTo("#modalCreate .error-area");
         },
-        showErrors: function(errorMap, errorList) {
+        showErrors: function (errorMap, errorList) {
             if (this.numberOfInvalids() > 0) {
                 page.dialogs.elements.errorAreaCreate.removeClass("hide").addClass("show");
             } else {
@@ -767,7 +678,7 @@
         errorPlacement: function (error, element) {
             error.appendTo("#modalUpdate .error-area");
         },
-        showErrors: function(errorMap, errorList) {
+        showErrors: function (errorMap, errorList) {
             if (this.numberOfInvalids() > 0) {
                 page.dialogs.elements.errorAreaUpdate.removeClass("hide").addClass("show");
             } else {
@@ -799,7 +710,7 @@
         errorPlacement: function (error, element) {
             error.appendTo("#modalDeposit .error-area");
         },
-        showErrors: function(errorMap, errorList) {
+        showErrors: function (errorMap, errorList) {
             if (this.numberOfInvalids() > 0) {
                 page.dialogs.elements.errorAreaDeposit.removeClass("hide").addClass("show");
             } else {
@@ -809,7 +720,7 @@
             this.defaultShowErrors();
         },
         submitHandler: function () {
-                page.dialogs.commands.deposit();
+            page.dialogs.commands.deposit();
         }
     });
     page.dialogs.elements.formWithdraw.validate({
@@ -831,7 +742,7 @@
         errorPlacement: function (error, element) {
             error.appendTo("#modalWithdraw .error-area");
         },
-        showErrors: function(errorMap, errorList) {
+        showErrors: function (errorMap, errorList) {
             if (this.numberOfInvalids() > 0) {
                 page.dialogs.elements.errorAreaWithdraw.removeClass("hide").addClass("show");
             } else {
@@ -844,6 +755,37 @@
             page.dialogs.commands.withdraw();
         }
     });
+    page.dialogs.elements.formTransfer.validate({
+        rules: {
+            transferAmount: {
+                required: true,
+                number: true,
+                maxlength: 15,
+            }
+        },
+        messages: {
+            transferAmount: {
+                required: 'Số tiền không được để trống',
+            }
+        },
+        errorLabelContainer: "#modalTransfer .error-area",
+        errorPlacement: function (error, element) {
+            error.appendTo("#modalTransfer .error-area");
+        },
+        showErrors: function (errorMap, errorList) {
+            if (this.numberOfInvalids() > 0) {
+                page.dialogs.elements.errorAreaTransfer.removeClass("hide").addClass("show");
+            } else {
+                page.dialogs.elements.errorAreaTransfer.removeClass("show").addClass("hide").empty();
+                page.dialogs.elements.errorAreaTransfer.removeClass("error");
+            }
+            this.defaultShowErrors();
+        },
+        submitHandler: function () {
+            page.dialogs.commands.transfer();
+        }
+    });
+
     $(() => {
         page.loadData();
 

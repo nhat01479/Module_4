@@ -104,7 +104,9 @@ public class CustomerServiceImpl implements ICustomerService {
         transferRepository.save(transfer);
 
         Customer sender = customerRepository.findById(transfer.getSender().getId()).get();
+        Customer recipient = customerRepository.findById(transfer.getRecipient().getId()).get();
         transfer.setSender(sender);
+        transfer.setRecipient(recipient);
 
         return transfer;
 

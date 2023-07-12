@@ -33,13 +33,14 @@ public class WithdrawAPI {
 
     @PostMapping("/{customerId}")
     public ResponseEntity<?> withdraw(@PathVariable("customerId") String customerIdStr, @RequestBody WithdrawCreReqDTO withdrawCreReqDTO, BindingResult bindingResult) {
+        Map<String, String> data = new HashMap<>();
+
         new WithdrawCreReqDTO().validate(withdrawCreReqDTO, bindingResult);
 
         if (bindingResult.hasFieldErrors()) {
             return appUtils.mapErrorToResponse(bindingResult);
         }
         if (!validateUtils.isNumberValid(customerIdStr)) {
-            Map<String, String> data = new HashMap<>();
             data.put("message", "Mã khách hàng không hợp lệ");
             return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
         }
@@ -49,13 +50,17 @@ public class WithdrawAPI {
         Optional<Customer> customerOptional = customerService.findById(customerId);
 
         if (customerOptional.isEmpty()) {
-            Map<String, String> data = new HashMap<>();
             data.put("message", "Mã khách hàng không tồn tại");
             return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
         }
         Customer customer = customerOptional.get();
 
         BigDecimal transactionAmount = BigDecimal.valueOf(Long.parseLong(withdrawCreReqDTO.getTransactionAmount()));
+
+        if (customer.getBalance().compareTo(transactionAmount) < 0) {
+            data.put("message", "Số dư không đủ để thực hiện giao dịch");
+            return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+        }
 
         Withdraw withdraw = new Withdraw();
         withdraw.setTransactionAmount(transactionAmount);
