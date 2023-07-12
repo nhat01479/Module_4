@@ -80,7 +80,7 @@ public class TransferAPI {
         transfer.setTransactionAmount(transactionAmount);
         transfer.setSender(sender);
         transfer.setRecipient(recipient);
-        transfer.setFees(10L);
+//        transfer.setFees(10L);
         transfer.setFeesAmount(feesAmount);
         customerService.transfer(transfer);
 

@@ -100,13 +100,13 @@ public class CustomerAPI {
             return appUtils.mapErrorToResponse(bindingResult);
         }
 
-        customer.setFullName(customerResDTO.getFullName());
         String newEmail = customerResDTO.getEmail();
 
         if (customerService.existsByEmailAndIdNot(newEmail, customer.getId())) {
             data.put("message", "Email đã tồn tại");
             return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
         } else {
+            customer.setFullName(customerResDTO.getFullName());
             customer.setEmail(newEmail);
             customer.setPhone(customerResDTO.getPhone());
             customer.setAddress(customerResDTO.getAddress());
@@ -121,5 +121,20 @@ public class CustomerAPI {
 //        Customer newCustomer = customerService.save(customer);
 //
 //        return new ResponseEntity<>(newCustomer, HttpStatus.OK);
+    }
+
+    @PatchMapping("/delete/{customerId}")
+    public ResponseEntity<?> delete(@PathVariable Long customerId) {
+        Optional<Customer> optionalCustomer = customerService.findById(Long.valueOf(customerId));
+        if (optionalCustomer.isEmpty()) {
+            Map<String, String> data = new HashMap<>();
+            data.put("message", "ID không tồn tại");
+            return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+        }
+        Customer customer = optionalCustomer.get();
+        customerService.softDeleteById(customerId);
+
+        return new ResponseEntity<>(customer, HttpStatus.OK);
+
     }
 }

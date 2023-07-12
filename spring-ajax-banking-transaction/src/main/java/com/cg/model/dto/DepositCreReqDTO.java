@@ -29,7 +29,7 @@ public class DepositCreReqDTO implements Validator {
 
         String transactionAmountStr = depositCreReqDTO.transactionAmount;
 
-        if (transactionAmountStr == null || transactionAmountStr.length() == 0) {
+        if (transactionAmountStr == null || transactionAmountStr.trim().length() == 0) {
             errors.rejectValue("transactionAmount", "transactionAmount.length", "Số tiền cần nạp không được để trống");
             return;
         }
