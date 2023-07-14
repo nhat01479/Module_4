@@ -75,9 +75,10 @@ public class CustomerAPI {
         if (bindingResult.hasFieldErrors()){
             return appUtils.mapErrorToResponse(bindingResult);
         }
-
-        String email = customer.getEmail();
-        if (customerService.existsByEmailNot(email)){
+//
+        String email = customerUpdateReqDTO.getEmail();
+        System.out.println(email);
+        if (customerService.existsByEmailAndIdNot(email, customer.getId())){
             throw new EmailExistsException("Email đã tồn tại");
         }
 

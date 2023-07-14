@@ -130,9 +130,9 @@
     page.dialogs.elements.fullNameUpdate = $('#fullNameUpdate');
     page.dialogs.elements.emailUpdate = $('#emailUpdate');
     page.dialogs.elements.phoneUpdate = $('#phoneUpdate');
-    page.dialogs.elements.provinceUpdate = $('#provinceUpdate')
-    page.dialogs.elements.districtUpdate = $('#districtUpdate')
-    page.dialogs.elements.wardUpdate = $('#wardUpdate')
+    page.dialogs.elements.provinceUpdate = $('#provinceUpdate');
+    page.dialogs.elements.districtUpdate = $('#districtUpdate');
+    page.dialogs.elements.wardUpdate = $('#wardUpdate');
     page.dialogs.elements.addressUpdate = $('#addressUpdate');
     page.dialogs.elements.btnUpdate = $('#btnUpdate');
 
@@ -275,7 +275,7 @@
                 console.log(error);
             })
     }
-    page.commands.getAllProvinces = () => {
+    page.commands.getAllProvinces = (elementSelect) => {
 
         return   $.ajax({
                     type: 'GET',
@@ -283,45 +283,46 @@
                  })
                     .done((data) => {
                         const provinces = data.results;
-                        page.dialogs.elements.provinceCreate.empty();
+                        elementSelect.empty();
 
                         $.each(provinces, (index, item) => {
+
                             const str = `<option value="${item.province_id}">${item.province_name}</option>`
-                            page.dialogs.elements.provinceCreate.append(str);
+                            elementSelect.append(str);
                         })
                     })
     }
 
-    page.commands.getALlDistricts = (provinceId) => {
+    page.commands.getALlDistricts = (provinceId, elementSelect) => {
         return $.ajax({
             type: 'GET',
             url: page.url.getALlDistricts + '/' + provinceId
         })
             .done((data) => {
                 const districts = data.results;
-                page.dialogs.elements.districtCreate.empty();
+                elementSelect.empty();
 
                 $.each(districts, (index, item) => {
                     const str = `<option value="${item.district_id}">${item.district_name}</option>`;
-                    page.dialogs.elements.districtCreate.append(str);
+                    elementSelect.append(str);
                 });
             })
     }
-    page.commands.getAllWards = (districtId) => {
-        $.ajax({
+    page.commands.getAllWards = (districtId, elementSelect) => {
+       return  $.ajax({
             type: 'GET',
             url: page.url.getAllWards + '/' + districtId
         })
             .done((data) => {
                 const wards = data.results;
 
-                page.dialogs.elements.wardCreate.empty();
+                elementSelect.empty();
 
                 $.each(wards, (index, item) => {
                     const str = `<option value="${item.ward_id}">${item.ward_name}</option>`;
-                    page.dialogs.elements.wardCreate.append(str);
+                    elementSelect.append(str);
                 });
-            })
+            });
     }
     page.commands.handleAddEventShowModalUpdate = (customerId) => {
 
@@ -330,10 +331,42 @@
             page.dialogs.elements.fullNameUpdate.val(data.fullName);
             page.dialogs.elements.emailUpdate.val(data.email);
             page.dialogs.elements.phoneUpdate.val(data.phone);
-            page.dialogs.elements.provinceUpdate.val(data.locationRegion.provinceId);
-            page.dialogs.elements.districtUpdate.val(data.locationRegion.districtId);
-            page.dialogs.elements.wardUpdate.val(data.locationRegion.wardId);
             page.dialogs.elements.addressUpdate.val(data.locationRegion.address);
+
+            page.commands.getAllProvinces(page.dialogs.elements.provinceUpdate).then(() => {
+
+                const selectProvince = page.dialogs.elements.provinceUpdate.find("option");
+                for (let i = 0; i < selectProvince.length; i++) {
+                    const optionProvince = selectProvince[i];
+                    if (optionProvince.value === data.locationRegion.provinceId) {
+                        optionProvince.setAttribute("selected", true);
+
+                        page.commands.getALlDistricts(optionProvince.value, page.dialogs.elements.districtUpdate).then(() => {
+
+                            const selectDistricts = page.dialogs.elements.districtUpdate.find("option");
+                            for (let i = 0; i < selectDistricts.length; i++) {
+                                const optionDistrict = selectDistricts[i];
+                                if (optionDistrict.value === data.locationRegion.districtId) {
+                                    optionDistrict.setAttribute("selected", true);
+
+                                    page.commands.getAllWards(optionDistrict.value, page.dialogs.elements.wardUpdate).then(() => {
+
+                                        const selectWard = page.dialogs.elements.wardUpdate.find("option");
+                                        for (let i = 0; i < selectWard.length; i++) {
+                                            const optionWard = selectWard[i];
+                                            if (optionWard.value === data.locationRegion.wardId) {
+                                                console.log(optionWard);
+                                                optionWard.setAttribute("selected", true);
+                                            }
+                                        }
+                                    })
+                                }
+
+                            }
+                        })
+                    }
+                }
+            })
 
             page.dialogs.elements.modalUpdate.modal('show');
         })
@@ -471,15 +504,31 @@
             });
     }
     page.dialogs.commands.update = () => {
+        console.log(customerId);
+        const provinceId = page.dialogs.elements.provinceUpdate.val();
+        const provinceName = page.dialogs.elements.provinceUpdate.find('option:selected').text();
+        const districtId = page.dialogs.elements.districtUpdate.val();
+        const districtName = page.dialogs.elements.districtUpdate.find('option:selected').text();
+        const wardId = page.dialogs.elements.wardUpdate.val();
+        const wardName = page.dialogs.elements.wardUpdate.find('option:selected').text();
+        const address = page.dialogs.elements.addressUpdate.val();
+
+        locationRegion.provinceId = provinceId;
+        locationRegion.provinceName = provinceName;
+        locationRegion.districtId = districtId;
+        locationRegion.districtName = districtName;
+        locationRegion.wardId = wardId;
+        locationRegion.wardName = wardName;
+        locationRegion.address = address;
+
         const fullName = page.dialogs.elements.fullNameUpdate.val();
         const email = page.dialogs.elements.emailUpdate.val();
         const phone = page.dialogs.elements.phoneUpdate.val();
-        const address = page.dialogs.elements.addressUpdate.val();
 
         customer.fullName = fullName;
         customer.email = email;
         customer.phone = phone;
-        customer.address = address;
+        customer.locationRegion = locationRegion;
 
         $.ajax({
             headers: {
@@ -662,31 +711,45 @@
     }
 
     page.initializeControlEvent = () => {
+
         page.elements.tbCustomerBody.on('click', 'tr', function () {
             page.elements.tbCustomerBody.find('span').removeClass('selected').addClass('unselected');
             $(this).find('span').removeClass('unselected').addClass('selected');
 
-            const customerId = $(this).attr('id').replace('tr_', '');
-
-            const str = page.commands.renderFooter(customerId);
+            const row_id = $(this).attr('id').replace('tr_', '');
+            const str = page.commands.renderFooter(row_id);
             page.elements.footer.empty().append(str);
 
             page.elements.footer.on('click','.edit',function () {
+                customerId = $(this).data('id');
                 page.commands.handleAddEventShowModalUpdate(customerId);
             })
         })
+        /*      Onchange        */
         page.dialogs.elements.provinceCreate.on('change', function () {
             const provinceId = $(this).val();
-            page.commands.getALlDistricts(provinceId).then(() => {
+            page.commands.getALlDistricts(provinceId, page.dialogs.elements.districtCreate).then(() => {
                 const districtId =  page.dialogs.elements.districtCreate.val();
-                page.commands.getAllWards((districtId));
+                page.commands.getAllWards(districtId, page.dialogs.elements.wardCreate);
             })
         })
         page.dialogs.elements.districtCreate.on('change', function () {
             const districtId = $(this).val();
-            page.commands.getAllWards(districtId);
+            page.commands.getAllWards(districtId, page.dialogs.elements.wardCreate);
+        })
+        page.dialogs.elements.provinceUpdate.on('change', function () {
+            const provinceId = $(this).val();
+            page.commands.getALlDistricts(provinceId, page.dialogs.elements.districtUpdate).then(() => {
+                const districtId =  page.dialogs.elements.districtUpdate.val();
+                page.commands.getAllWards(districtId, page.dialogs.elements.wardUpdate);
+            })
+        })
+        page.dialogs.elements.districtUpdate.on('change', function () {
+            const districtId = $(this).val();
+            page.commands.getAllWards(districtId, page.dialogs.elements.wardUpdate);
         })
 
+        /*      Onchange        */
         page.elements.btnShowCreateModal.on('click', () => {
             page.dialogs.elements.modalCreate.modal('show');
         })
@@ -778,18 +841,30 @@
     }
 
 
+
+
     page.loadData = () => {
         page.commands.getAllCustomers();
 
-        page.commands.getAllProvinces().then(() => {
+        // page.commands.getAllProvinces().then(() => {
+        //     const provinceId = page.dialogs.elements.provinceCreate.val();
+        //
+        //     page.commands.getALlDistricts(provinceId).then(() => {
+        //         const districtId = page.dialogs.elements.districtCreate.val();
+        //
+        //         page.commands.getAllWards(districtId);
+        //     });
+        // });
+        page.commands.getAllProvinces(page.dialogs.elements.provinceCreate).then(() => {
             const provinceId = page.dialogs.elements.provinceCreate.val();
 
-            page.commands.getALlDistricts(provinceId).then(() => {
+            page.commands.getALlDistricts(provinceId, page.dialogs.elements.districtCreate).then(() => {
                 const districtId = page.dialogs.elements.districtCreate.val();
 
-                page.commands.getAllWards(districtId);
+                page.commands.getAllWards(districtId, page.dialogs.elements.wardCreate);
             });
         });
+
 
     }
 
