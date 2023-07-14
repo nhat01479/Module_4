@@ -130,6 +130,9 @@
     page.dialogs.elements.fullNameUpdate = $('#fullNameUpdate');
     page.dialogs.elements.emailUpdate = $('#emailUpdate');
     page.dialogs.elements.phoneUpdate = $('#phoneUpdate');
+    page.dialogs.elements.provinceUpdate = $('#provinceUpdate')
+    page.dialogs.elements.districtUpdate = $('#districtUpdate')
+    page.dialogs.elements.wardUpdate = $('#wardUpdate')
     page.dialogs.elements.addressUpdate = $('#addressUpdate');
     page.dialogs.elements.btnUpdate = $('#btnUpdate');
 
@@ -224,7 +227,7 @@
                             <i class="fas fa-ban" ></i> Suspend
                     </button>
                 </div>
-        `
+        `;
     }
 
     page.commands.getAllCustomers = () => {
@@ -327,14 +330,16 @@
             page.dialogs.elements.fullNameUpdate.val(data.fullName);
             page.dialogs.elements.emailUpdate.val(data.email);
             page.dialogs.elements.phoneUpdate.val(data.phone);
-            page.dialogs.elements.addressUpdate.val(data.address);
+            page.dialogs.elements.provinceUpdate.val(data.locationRegion.provinceId);
+            page.dialogs.elements.districtUpdate.val(data.locationRegion.districtId);
+            page.dialogs.elements.wardUpdate.val(data.locationRegion.wardId);
+            page.dialogs.elements.addressUpdate.val(data.locationRegion.address);
 
             page.dialogs.elements.modalUpdate.modal('show');
         })
             .catch((error) => {
                 console.log(error);
             });
-
     }
     page.commands.handleAddEventShowModalDeposit = (customerId) => {
 
@@ -657,6 +662,19 @@
     }
 
     page.initializeControlEvent = () => {
+        page.elements.tbCustomerBody.on('click', 'tr', function () {
+            page.elements.tbCustomerBody.find('span').removeClass('selected').addClass('unselected');
+            $(this).find('span').removeClass('unselected').addClass('selected');
+
+            const customerId = $(this).attr('id').replace('tr_', '');
+
+            const str = page.commands.renderFooter(customerId);
+            page.elements.footer.empty().append(str);
+
+            page.elements.footer.on('click','.edit',function () {
+                page.commands.handleAddEventShowModalUpdate(customerId);
+            })
+        })
         page.dialogs.elements.provinceCreate.on('change', function () {
             const provinceId = $(this).val();
             page.commands.getALlDistricts(provinceId).then(() => {
@@ -772,8 +790,7 @@
                 page.commands.getAllWards(districtId);
             });
         });
-        const str = page.commands.renderFooter(1);
-        page.elements.footer.empty().append(str);
+
     }
 
 
