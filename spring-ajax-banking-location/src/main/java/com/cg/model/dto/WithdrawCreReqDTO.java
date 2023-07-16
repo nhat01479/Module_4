@@ -36,7 +36,7 @@ public class WithdrawCreReqDTO implements Validator {
             BigDecimal transactionAmount = BigDecimal.valueOf(Long.parseLong(transactionAmountStr));
 
             if (transactionAmount.compareTo(BigDecimal.valueOf(1000L)) < 0) {
-                errors.rejectValue("transactionAmount", "transactionAmount.min", "Số rút thấp nhất là 10.000");
+                errors.rejectValue("transactionAmount", "transactionAmount.min", "Số tiền rút thấp nhất là 1.000");
             } else {
                 if (transactionAmount.compareTo(BigDecimal.valueOf(100000000L)) > 0) {
                     errors.rejectValue("transactionAmount", "transactionAmount.max", "Số tiền muốn rút tối đa là 100.000.000");

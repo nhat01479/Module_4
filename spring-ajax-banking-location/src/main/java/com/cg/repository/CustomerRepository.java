@@ -16,8 +16,11 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<Customer> findAllByFullNameLikeOrEmailLikeOrPhoneLike(String fullName, String email, String phone);
 
     List<Customer> findAllByIdNot(Long id);
-    @Query("select new com.cg.model.dto.customer.CustomerResDTO (c.id, c.fullName, c.email, c.phone, c.locationRegion, c.balance) from Customer as c where c.deleted = false")
+    @Query("select new com.cg.model.dto.customer.CustomerResDTO (c.id, c.fullName, c.email, c.phone, c.balance, c.locationRegion) from Customer as c where c.deleted = false")
     List<CustomerResDTO> findAllCustomerResDTO();
+    @Query("SELECT NEW com.cg.model.dto.customer.CustomerResDTO (c.id, c.fullName, c.email, c.phone, c.balance, c.locationRegion) FROM Customer AS c WHERE c.deleted = false AND c.id != :senderId ")
+    List<CustomerResDTO> findAllRecipientsWithoutSenderId(@Param("senderId") Long senderId);
+
     List<Customer> findAllByDeletedIs(Boolean boo);
     Boolean existsByEmail(String email);
     Boolean existsByEmailAndIdNot(String email, Long id);

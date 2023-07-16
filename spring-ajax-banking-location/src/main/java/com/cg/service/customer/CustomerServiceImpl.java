@@ -1,16 +1,21 @@
 package com.cg.service.customer;
 
+import com.cg.exception.DataInputException;
 import com.cg.model.*;
+import com.cg.model.dto.TransferCreReqDTO;
 import com.cg.model.dto.customer.*;
 import com.cg.model.dto.location.LocationRegionCreReqDTO;
 import com.cg.model.dto.location.LocationRegionCreResDTO;
 import com.cg.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 @Service
 @Transactional
@@ -41,6 +46,11 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
+    public List<CustomerResDTO> findAllRecipientsWithoutSenderId(Long senderId) {
+        return customerRepository.findAllRecipientsWithoutSenderId(senderId);
+    }
+
+    @Override
     public CustomerCreResDTO create(CustomerCreReqDTO customerCreReqDTO) {
 
         LocationRegionCreReqDTO locationRegionCreReqDTO = customerCreReqDTO.getLocationRegion();
@@ -55,17 +65,18 @@ public class CustomerServiceImpl implements ICustomerService {
         return customerCreResDTO;
     }
     @Override
-    public CustomerUpdateResDTO update(CustomerUpdateReqDTO customerUpdateReqDTO) {
+    public CustomerUpdateResDTO update(CustomerUpdateReqDTO customerUpdateReqDTO, Customer customer) {
 
         LocationRegionCreReqDTO locationRegionCreReqDTO = customerUpdateReqDTO.getLocationRegion();
         LocationRegion locationRegion = locationRegionCreReqDTO.toLocationRegion();
         locationRegionRepository.save(locationRegion);
 
-        Customer customer = customerUpdateReqDTO.toCustomer();
-        customer.setLocationRegion(locationRegion);
-        customerRepository.save(customer);
+        Customer customerUpdate = customerUpdateReqDTO.toCustomer(customer);
+        customerUpdate.setLocationRegion(locationRegion);
+        customerUpdate.setBalance(customer.getBalance());
+        customerRepository.save(customerUpdate);
 
-        return customer.toCustomerUpdateResDTO();
+        return customerUpdate.toCustomerUpdateResDTO();
     }
 
     public List<Customer> findAllByDeletedIs(Boolean boo) {
@@ -127,7 +138,6 @@ public class CustomerServiceImpl implements ICustomerService {
         return customer;
     }
 
-    @Override
     public void transfer(Transfer transfer) {
         BigDecimal transferAmount = transfer.getTransferAmount();
         BigDecimal transactionAmount = transfer.getTransactionAmount();
@@ -144,6 +154,44 @@ public class CustomerServiceImpl implements ICustomerService {
         transfer.setRecipient(recipient);
 
 
+
+    }
+
+    @Override
+    public void transfer(TransferCreReqDTO transferCreReqDTO) {
+
+        Long senderId = transferCreReqDTO.getSenderId();
+        Long recipientId = transferCreReqDTO.getRecipientId();
+
+        Customer sender = customerRepository.findById(senderId).orElseThrow(() -> {
+            throw new DataInputException("Sender không tồn tại");
+        });
+
+        Customer recipient = customerRepository.findById(recipientId).orElseThrow(() -> {
+            throw new DataInputException("Recipient không tồn tại");
+        });
+
+        BigDecimal currentBalance = sender.getBalance();
+        Long transferAmountLong = Long.valueOf(transferCreReqDTO.getTransferAmount());
+        BigDecimal transferAmount = BigDecimal.valueOf(transferAmountLong);
+        Long fees = 10L;
+        BigDecimal feesAmount = transferAmount.multiply(BigDecimal.valueOf(fees)).divide(BigDecimal.valueOf(100));
+        BigDecimal transactionAmount = transferAmount.add(feesAmount);
+
+        if (currentBalance.compareTo(transactionAmount) < 0) {
+            throw new DataInputException("Số dư không đủ để thực hiện giao dịch");
+        }
+        customerRepository.decrementBalance(senderId, transactionAmount);
+        customerRepository.incrementBalance(recipientId, transferAmount);
+
+        Transfer transfer = new Transfer();
+        transfer.setTransferAmount(transferAmount);
+        transfer.setTransactionAmount(transactionAmount);
+        transfer.setSender(sender);
+        transfer.setRecipient(recipient);
+        transfer.setFees(fees);
+        transfer.setFeesAmount(feesAmount);
+        transferRepository.save(transfer);
 
     }
 

@@ -3,6 +3,7 @@ package com.cg.api;
 import com.cg.model.Customer;
 import com.cg.model.Deposit;
 import com.cg.model.dto.DepositCreReqDTO;
+import com.cg.model.dto.customer.CustomerResDTO;
 import com.cg.service.customer.ICustomerService;
 import com.cg.utils.AppUtils;
 import com.cg.utils.ValidateUtils;
@@ -62,8 +63,9 @@ public class DepositAPI {
         deposit.setCustomer(customer);
 
         Customer newCustomer = customerService.deposit(deposit);
+        CustomerResDTO customerResDTO = newCustomer.toCustomerResDTO();
 
 
-        return new ResponseEntity<>(newCustomer, HttpStatus.OK);
+        return new ResponseEntity<>(customerResDTO, HttpStatus.OK);
     }
 }

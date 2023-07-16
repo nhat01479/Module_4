@@ -70,23 +70,28 @@ public class CustomerAPI {
         Customer customer = customerService.findById(Long.valueOf(customerId)).orElseThrow(() ->
                 new DataInputException("Mã khách hàng không tồn tại"));
 
-        new CustomerResDTO().validate(customerUpdateReqDTO, bindingResult);
+        new CustomerUpdateReqDTO().validate(customerUpdateReqDTO, bindingResult);
 
         if (bindingResult.hasFieldErrors()){
             return appUtils.mapErrorToResponse(bindingResult);
         }
-//
+
         String email = customerUpdateReqDTO.getEmail();
-        System.out.println(email);
         if (customerService.existsByEmailAndIdNot(email, customer.getId())){
             throw new EmailExistsException("Email đã tồn tại");
         }
 
-        CustomerUpdateResDTO customerUpdateResDTO = customerService.update(customerUpdateReqDTO);
+        CustomerUpdateResDTO customerUpdateResDTO = customerService.update(customerUpdateReqDTO, customer);
 
         return new ResponseEntity<>(customerUpdateResDTO, HttpStatus.OK);
 
     }
+    @GetMapping("/recipients-without-sender/{senderId}")
+    public ResponseEntity<?> getAllRecipientWithoutSender(@PathVariable Long senderId) {
+        List<CustomerResDTO> recipients = customerService.findAllRecipientsWithoutSenderId(senderId);
+        return new ResponseEntity<>(recipients, HttpStatus.OK);
+    }
+
 
     @PatchMapping("/delete/{customerId}")
     public ResponseEntity<?> delete(@PathVariable String customerId) {
@@ -99,4 +104,6 @@ public class CustomerAPI {
         return new ResponseEntity<>(customer.toCustomerResDTO(), HttpStatus.OK);
 
     }
-}
+
+
+    }

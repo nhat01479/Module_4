@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 @Setter
 @Entity
 @Transactional
+@Table(name = "transfers")
 public class Transfer extends BaseEntity implements Validator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

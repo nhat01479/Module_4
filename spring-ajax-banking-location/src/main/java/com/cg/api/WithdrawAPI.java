@@ -3,6 +3,7 @@ package com.cg.api;
 import com.cg.model.Customer;
 import com.cg.model.Withdraw;
 import com.cg.model.dto.WithdrawCreReqDTO;
+import com.cg.model.dto.customer.CustomerResDTO;
 import com.cg.service.customer.ICustomerService;
 import com.cg.utils.AppUtils;
 import com.cg.utils.ValidateUtils;
@@ -65,10 +66,9 @@ public class WithdrawAPI {
         withdraw.setCustomer(customer);
 
         Customer newCustomer = customerService.withdraw(withdraw);
+        CustomerResDTO customerResDTO = newCustomer.toCustomerResDTO();
 
-
-
-        return new ResponseEntity<>(newCustomer, HttpStatus.OK);
+        return new ResponseEntity<>(customerResDTO, HttpStatus.OK);
 
     }
 }

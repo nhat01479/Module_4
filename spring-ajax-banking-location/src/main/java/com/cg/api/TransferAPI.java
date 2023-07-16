@@ -1,8 +1,10 @@
 package com.cg.api;
 
+import com.cg.exception.DataInputException;
 import com.cg.model.Customer;
 import com.cg.model.Transfer;
 import com.cg.model.dto.TransferCreReqDTO;
+import com.cg.model.dto.TransferCreResDTO;
 import com.cg.service.customer.ICustomerService;
 import com.cg.utils.AppUtils;
 import com.cg.utils.ValidateUtils;
@@ -27,68 +29,42 @@ public class TransferAPI {
     @Autowired
     private ValidateUtils validateUtils;
 
-    @PostMapping("/{customerId}")
-    public ResponseEntity<?> transfer(@PathVariable("customerId") String senderIdStr, @RequestBody TransferCreReqDTO transferCreReqDTO, BindingResult bindingResult) {
+    @PostMapping
+    public ResponseEntity<?> transfer( @RequestBody TransferCreReqDTO transferCreReqDTO, BindingResult bindingResult) {
         Map<String, String> data = new HashMap<>();
 
-        if (!validateUtils.isNumberValid(senderIdStr)) {
-            data.put("message", "Mã khách hàng không hợp lệ");
-            return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
-        }
-
-        Long senderId = Long.valueOf(senderIdStr);
-
-        Optional<Customer> optionalSender = customerService.findById(senderId);
-        if (optionalSender.isEmpty()) {
-            data.put("message", "Sender không hợp lệ");
-            return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
-        }
-        Customer sender = optionalSender.get();
-
-        Long recipientId = transferCreReqDTO.getRecipientId();
-        Optional<Customer> optionalRecipient = customerService.findById(recipientId);
-        if (optionalRecipient.isEmpty()) {
-            data.put("message", "Không tìm thấy Recipient");
-            return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
-        }
-        Customer recipient = optionalRecipient.get();
-
-        if (sender.getId() == recipient.getId()) {
-            data.put("message", "Sender phải khác Recipient");
-            return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
-        }
-
         new TransferCreReqDTO().validate(transferCreReqDTO, bindingResult);
+
         if (bindingResult.hasFieldErrors()) {
             return appUtils.mapErrorToResponse(bindingResult);
         }
 
-        BigDecimal currentBalance = sender.getBalance();
-        Long transferAmountLong = Long.valueOf(transferCreReqDTO.getTransferAmount());
-        BigDecimal transferAmount = BigDecimal.valueOf(transferAmountLong);
-        Long fees = 10L;
-        BigDecimal feesAmount = transferAmount.multiply(BigDecimal.valueOf(fees)).divide(BigDecimal.valueOf(100));
-        BigDecimal transactionAmount = transferAmount.add(feesAmount);
+        Long senderId = transferCreReqDTO.getSenderId();
+        Long recipientId = transferCreReqDTO.getRecipientId();
 
-        if (currentBalance.compareTo(transactionAmount) < 0) {
-            data.put("message", "Số dư không đủ để thực hiện giao dịch");
+        if (!validateUtils.isNumberValid(String.valueOf(senderId))) {
+            data.put("message", "Mã khách hàng không hợp lệ");
+            return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+        }
+        if (senderId == recipientId) {
+            data.put("message", "Sender phải khác Recipient");
             return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
         }
 
-        Transfer transfer = new Transfer();
-        transfer.setTransferAmount(transferAmount);
-        transfer.setTransactionAmount(transactionAmount);
-        transfer.setSender(sender);
-        transfer.setRecipient(recipient);
-//        transfer.setFees(10L);
-        transfer.setFeesAmount(feesAmount);
-        customerService.transfer(transfer);
+        customerService.transfer(transferCreReqDTO);
 
-        List<Customer> customers = new ArrayList<>();
-        customers.add(transfer.getSender());
-        customers.add(transfer.getRecipient());
+        TransferCreResDTO transferCreResDTO = new TransferCreResDTO();
+        Customer sender = customerService.findById(senderId).get();
+        Customer recipient = customerService.findById(recipientId).get();
 
-        return new ResponseEntity<>(customers, HttpStatus.OK);
+        transferCreResDTO.setSender(sender.toCustomerResDTO());
+        transferCreResDTO.setRecipient(recipient.toCustomerResDTO());
+
+//        Map<String, CustomerResDTO> data = new HashMap<>();
+//        data.put("sender", sender.toCustomerResDTO());
+//        data.put("recipient", recipient.toCustomerResDTO());
+
+        return new ResponseEntity<>(transferCreResDTO, HttpStatus.OK);
 
     }
 }

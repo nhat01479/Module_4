@@ -23,9 +23,9 @@ public class CustomerUpdateReqDTO implements Validator {
     private String phone;
     private LocationRegionCreReqDTO locationRegion;
 
-    public Customer toCustomer() {
+    public Customer toCustomer(Customer customer) {
         return new Customer()
-                .setId(null)
+                .setId(customer.getId())
                 .setFullName(fullName)
                 .setEmail(email)
                 .setPhone(phone)

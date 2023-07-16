@@ -26,7 +26,7 @@ public class CustomerResDTO implements Validator {
     private BigDecimal balance;
 
     private LocationRegionDTO locationRegion;
-    public CustomerResDTO (Long id, String fullName, String email, String phone, LocationRegion locationRegion, BigDecimal balance) {
+    public CustomerResDTO (Long id, String fullName, String email, String phone, BigDecimal balance, LocationRegion locationRegion) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
