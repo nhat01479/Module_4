@@ -204,7 +204,13 @@ public class CustomerServiceImpl implements ICustomerService {
     @Override
     public void softDeleteById(Long id) {
         customerRepository.softDeleteById(id);
+
     }
+//    @Override
+//    public void softDelete(Customer customer) {
+//        customer.setDeleted(true);
+//        customerRepository.save(customer);
+//    }
 
     @Override
     public void delete(Customer customer) {

@@ -1,12 +1,10 @@
 package com.cg.controller;
 
-import com.cg.model.Customer;
-import com.cg.model.Deposit;
-import com.cg.model.Transfer;
-import com.cg.model.Withdraw;
+import com.cg.model.*;
 import com.cg.service.customer.ICustomerService;
 import com.cg.service.deposit.IDepositService;
 import com.cg.service.transfer.ITransferService;
+import com.cg.service.user.IUserService;
 import com.cg.service.withdraw.IWithdrawService;
 import com.cg.utils.AppUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,8 @@ public class CustomerController {
     @Autowired
     private AppUtils appUtils;
     @Autowired
+    private IUserService userService;
+    @Autowired
     private ICustomerService customerService;
     @Autowired
     private IDepositService depositService;
@@ -35,11 +35,21 @@ public class CustomerController {
     @Autowired
     private ITransferService transferService;
 
+
     @GetMapping
     public String showListPage(Model model) {
         List<Customer> customers = customerService.findAllByDeletedIs(false);
 
         model.addAttribute("customers", customers);
+
+        String username = appUtils.getPrincipalUsername();
+
+        User user = userService.getByUsername(username);
+        Role role = user.getRole();
+        String  roleCode = role.getCode();
+
+        model.addAttribute("username", username);
+        model.addAttribute("role", roleCode);
 
         return "customer/list";
     }

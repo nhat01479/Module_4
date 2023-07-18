@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of customers</title>
+    <link rel="stylesheet" href="/assets/bootstrap/v5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/fontawesome/v5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/assets/sweetalert2/v11.7.12/sweetalert2.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/bootstrap/v5.3.0/js/bootstrap.bundle.min.js"></script>
+
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="col-lg-6">
+            <h1>Transfer's history </h1>
+        </div>
+        <div class="col-lg-6 header-right-button">
+            <a href="/customers">
+                <button class="btn btn-outline-light">
+                    <i class="fas fa-list-ul"></i>
+                    List of customers
+                </button>
+            </a>
+
+        </div>
+    </header>
+
+    <div class="content">
+        <table class="table table-hover" id="tbTransfer">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Sender ID</th>
+                <th>Sender Name</th>
+                <th>Recipient ID</th>
+                <th>Recipient Name</th>
+                <th>Fees</th>
+                <th>Fees Amount</th>
+                <th>Transfer Amount</th>
+                <th>Transaction Amount</th>
+                <th colspan="2">Create at</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script src="/assets/js/jquery-3.6.0.min.js"></script>
+<script src="/assets/sweetalert2/v11.7.12/sweetalert2.all.min.js"></script>
+<script src="/assets/js/jquery.validate.min.js"></script>
+<script src="/assets/js/jquery.number.js"></script>
+<script src="/assets/js/app.js"></script>
+
+<script>
+    const page = {
+        url: {
+            getAllProvinces: App.API_LOCATION_REGION + '/',
+            getALlDistricts: App.API_LOCATION_REGION + '/district',
+            getAllWards: App.API_LOCATION_REGION + '/ward',
+
+            getAllCustomers: App.API_CUSTOMER,
+            getALlRecipients: App.API_CUSTOMER + '/recipients-without-sender/',
+            createCustomer: App.API_CUSTOMER,
+            getCustomerById: App.API_CUSTOMER,
+            updateCustomer: App.API_CUSTOMER,
+            updateBalance: App.API_CUSTOMER,
+            deposit: App.API_DEPOSIT,
+            withdraw: App.API_WITHDRAW,
+            transfer: App.API_TRANSFER,
+            deleteCustomer: App.API_CUSTOMER + '/delete/',
+        },
+        elements: {},
+        loadData: {},
+        commands: {},
+        dialogs: {
+            elements: {},
+            commands: {}
+        },
+        initializeControlEvent: {}
+
+    }
+    function renderTransfer(transfer, sender, recipient) {
+        return `<tr id="tr_${transfer.id}">
+                <td>${transfer.id} </td>
+                <td class="text-center">${transfer.senderId} </td>
+                <td>${sender.fullName} </td>
+                <td class="text-center">${transfer.recipientId} </td>
+                <td>${recipient.fullName} </td>
+                <td class="text-end">${transfer.transferAmount} </td>
+                <td class="text-end">${transfer.fees} </td>
+                <td class="text-end">${transfer.feesAmount} </td>
+                <td class="text-end">${transfer.transactionAmount} </td>
+            </tr>`;
+
+    }
+    function getAllTransfer(){
+        const tbTransferBody = $("#tbTransfer tbody");
+
+        tbTransferBody.empty();
+
+        $.ajax({
+            type: 'GET',
+            url: 'http://localhost:3000/transfers'
+        })
+            .done((data) => {
+                data.forEach(item => {
+                    let sender = new Customer();
+                    let recipient = new Customer();
+                    page.commands.getCustomerById(item.senderId).then((data) => {
+                        sender = data;
+                        page.commands.getCustomerById(item.recipientId).then((data) => {
+                            recipient = data;
+
+                            const str = renderTransfer(item, sender, recipient);
+                            tbTransferBody.prepend(str);
+                        });
+                    });
+
+
+                });
+
+            })
+            .fail((error) => {
+                console.log(error);
+            })
+    }
+    getAllTransfer()
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ import com.cg.utils.ValidateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -92,7 +93,7 @@ public class CustomerAPI {
         return new ResponseEntity<>(recipients, HttpStatus.OK);
     }
 
-
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PatchMapping("/delete/{customerId}")
     public ResponseEntity<?> delete(@PathVariable String customerId) {
         Customer customer = customerService.findById(Long.valueOf(customerId)).orElseThrow(() ->
