@@ -106,5 +106,12 @@ public class CustomerAPI {
 
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> getByName(@RequestParam ("keySearch") String keySearch ){
+        System.out.println(keySearch);
+        List<Customer> customers = customerService.findCustomerByFullNameLikeAndDeletedFalse(keySearch);
+
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
 
     }

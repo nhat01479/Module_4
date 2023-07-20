@@ -13,6 +13,7 @@ import java.util.List;
 
 public interface ICustomerService extends IGeneralService<Customer, Long> {
     List<Customer> findAllByIdNot(Long id);
+    List<Customer> findCustomerByFullNameLikeAndDeletedFalse(String name);
     List<CustomerResDTO> findAllCustomerResDTO();
     List<CustomerResDTO> findAllRecipientsWithoutSenderId(Long senderId);
     Boolean existsByEmail(String email);

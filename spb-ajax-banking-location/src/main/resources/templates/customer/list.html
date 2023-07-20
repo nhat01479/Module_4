@@ -13,10 +13,18 @@
 <body>
 <div class="container-fluid">
     <header>
-        <div class="col-lg-6">
-            <h1>List of customer </h1>
+        <div class="d-flex justify-content-between  col-lg-6" style="gap: 10px;">
+            <div class="col-6"><h1>List of customer</h1></div>
+            <div class="col-6 align-center">
+                <input type="text" placeholder="Search" class="form-control" id="searchBox" name="keySearch">
+                <ul id="searchRS" style="position: relative; top: 50px;"></ul>
+            </div>
+
         </div>
+
+
         <div class="col-lg-6 header-right-button">
+
             <button class="btn btn-outline-light">
                 <i class="fas fa-user"></i>
                 <span th:text="${username} + ' - ' + ${role}"></span>
@@ -241,7 +249,7 @@
                     <button  class="btn btn-primary transfer" data-id="${customerId}">
                             <i class="fas fa-exchange-alt" ></i> Transfer
                     </button>
-                     ${roleCode === 'ADMIN' ? btnDeleteStr : '' }
+                     ${roleCode === 'ADMIN' ? btnDeleteStr : ''}
                 </div>
         `;
     }
@@ -283,8 +291,8 @@
                 $("<option>").val("-1").text('--- Chọn người nhận ---').appendTo("#recipientId");
 
                 data.forEach((item) => {
-                        const str = page.commands.renderRecipient(item);
-                        page.dialogs.elements.recipients.append(str);
+                    const str = page.commands.renderRecipient(item);
+                    page.dialogs.elements.recipients.append(str);
                 });
             })
             .fail((error) => {
@@ -293,23 +301,23 @@
     }
     page.commands.getAllProvinces = () => {
 
-        return   $.ajax({
-                    type: 'GET',
-                    url: page.url.getAllProvinces
-                 })
-                    .done((data) => {
-                        const provinces = data.results;
-                        page.dialogs.elements.provinceCreate.empty();
-                        page.dialogs.elements.provinceUpdate.empty();
+        return $.ajax({
+            type: 'GET',
+            url: page.url.getAllProvinces
+        })
+            .done((data) => {
+                const provinces = data.results;
+                page.dialogs.elements.provinceCreate.empty();
+                page.dialogs.elements.provinceUpdate.empty();
 
-                        $.each(provinces, (index, item) => {
+                $.each(provinces, (index, item) => {
 
-                            const str = `<option value="${item.province_id}">${item.province_name}</option>`
-                            page.dialogs.elements.provinceCreate.append(str);
-                            page.dialogs.elements.provinceUpdate.append(str);
+                    const str = `<option value="${item.province_id}">${item.province_name}</option>`
+                    page.dialogs.elements.provinceCreate.append(str);
+                    page.dialogs.elements.provinceUpdate.append(str);
 
-                        })
-                    })
+                })
+            })
     }
 
     page.commands.getALlDistricts = (provinceId, elementSelect) => {
@@ -328,7 +336,7 @@
             })
     }
     page.commands.getAllWards = (districtId, elementSelect) => {
-       return  $.ajax({
+        return $.ajax({
             type: 'GET',
             url: page.url.getAllWards + '/' + districtId
         })
@@ -354,7 +362,7 @@
 
             page.dialogs.elements.provinceUpdate.val(locationRegion.provinceId);
 
-            page.commands.getALlDistricts(locationRegion.provinceId, page.dialogs.elements.districtUpdate).then(()=>{
+            page.commands.getALlDistricts(locationRegion.provinceId, page.dialogs.elements.districtUpdate).then(() => {
                 page.dialogs.elements.districtUpdate.val(locationRegion.districtId);
 
                 page.commands.getAllWards(locationRegion.districtId, page.dialogs.elements.wardUpdate).then(() => {
@@ -401,19 +409,19 @@
     page.commands.handleAddEventShowModalTransfer = (customerId) => {
 
         page.commands.getCustomerById(customerId).then((data) => {
-                customer = data;
-                page.dialogs.elements.senderId.val(customer.id);
-                page.dialogs.elements.senderFullName.val(customer.fullName);
-                page.dialogs.elements.senderEmail.val(customer.email);
-                page.dialogs.elements.senderBalance.val(customer.balance);
+            customer = data;
+            page.dialogs.elements.senderId.val(customer.id);
+            page.dialogs.elements.senderFullName.val(customer.fullName);
+            page.dialogs.elements.senderEmail.val(customer.email);
+            page.dialogs.elements.senderBalance.val(customer.balance);
 
-                page.commands.getALlRecipients(customerId);
+            page.commands.getALlRecipients(customerId);
 
-                page.dialogs.elements.transferAmount.val(0);
-                page.dialogs.elements.fees.val(10);
+            page.dialogs.elements.transferAmount.val(0);
+            page.dialogs.elements.fees.val(10);
 
 
-                page.dialogs.elements.modalTransfer.modal('show');
+            page.dialogs.elements.modalTransfer.modal('show');
 
         })
             .catch((error) => {
@@ -663,56 +671,56 @@
 
     }
     page.dialogs.commands.transfer = () => {
-            const senderId = page.dialogs.elements.senderId.val();
-            const transferAmount = page.dialogs.elements.transferAmount.val();
-            const recipientId = page.dialogs.elements.recipients.val();
+        const senderId = page.dialogs.elements.senderId.val();
+        const transferAmount = page.dialogs.elements.transferAmount.val();
+        const recipientId = page.dialogs.elements.recipients.val();
 
-                const obj = {
-                    senderId,
-                    recipientId,
-                    transferAmount
-                }
+        const obj = {
+            senderId,
+            recipientId,
+            transferAmount
+        }
 
-            $.ajax({
-                type: 'POST',
-                headers: {
-                    'accept': 'application/json',
-                    'content-type': 'application/json'
-                },
-                url: page.url.transfer,
-                data: JSON.stringify(obj)
+        $.ajax({
+            type: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json'
+            },
+            url: page.url.transfer,
+            data: JSON.stringify(obj)
+        })
+            .done((data) => {
+                const sender = data.sender;
+                const recipient = data.recipient;
+
+                const senderStr = page.commands.renderCustomer(sender, sender.locationRegion);
+                $('#tr_' + sender.id).replaceWith(senderStr);
+
+                const recipientStr = page.commands.renderCustomer(recipient, recipient.locationRegion);
+                $('#tr_' + recipient.id).replaceWith(recipientStr);
+
+                // Trường hợp trả về list customer
+
+                page.dialogs.elements.senderBalance.val(sender.balance);
+
+                // page.dialogs.elements.modalTransfer.modal('hide');
+
+                App.showSuccessAlert('Chuyển tiền thành công');
             })
-                .done((data) => {
-                    const sender = data.sender;
-                    const recipient = data.recipient;
+            .fail((jqXHR) => {
+                const responseJSON = jqXHR.responseJSON;
 
-                    const senderStr = page.commands.renderCustomer(sender, sender.locationRegion);
-                    $('#tr_' + sender.id).replaceWith(senderStr);
+                page.dialogs.elements.errorAreaTransfer.empty();
+                let str = '';
 
-                    const recipientStr = page.commands.renderCustomer(recipient, recipient.locationRegion);
-                    $('#tr_' + recipient.id).replaceWith(recipientStr);
-
-                    // Trường hợp trả về list customer
-
-                    page.dialogs.elements.senderBalance.val(sender.balance);
-
-                    // page.dialogs.elements.modalTransfer.modal('hide');
-
-                    App.showSuccessAlert('Chuyển tiền thành công');
+                $.each(responseJSON, (k, v) => {
+                    str += `<label for="${k}Transfer">${v}</label>`
                 })
-                .fail((jqXHR) => {
-                    const responseJSON = jqXHR.responseJSON;
+                page.dialogs.elements.errorAreaTransfer.append(str).removeClass('hide').addClass('show');
 
-                    page.dialogs.elements.errorAreaTransfer.empty();
-                    let str = '';
-
-                    $.each(responseJSON, (k, v) => {
-                        str += `<label for="${k}Transfer">${v}</label>`
-                    })
-                    page.dialogs.elements.errorAreaTransfer.append(str).removeClass('hide').addClass('show');
-
-                    console.log(jqXHR);
-                })
+                console.log(jqXHR);
+            })
     }
 
     page.commands.onchangeProvince = (provinceId, districtElement, wardElement) => {
@@ -721,6 +729,46 @@
             page.commands.getAllWards(districtId, wardElement);
         })
     }
+
+
+    $('#searchBox').on('input', function () {
+        let searchValue = $(this).val();
+        $.ajax({
+            url: page.url.getAllCustomers ,
+            type: 'GET',
+            data: {keySearch: searchValue},
+        })
+            .done((data) => {
+                $('#searchRS').empty();
+                data.forEach((item) => {
+                    console.log(item);
+
+                    customer = item;
+                    locationRegion = customer.locationRegion;
+                    const str = `<li data-id="${item.id}"> ${item.fullName} - ${item.phone} </li>`
+                    $('#searchRS').prepend(str);
+                })
+            })
+            .fail ((jqXHR)=> {
+                console.log(jqXHR);
+            })
+    });
+
+    //
+    // $(document).ready(function () {
+    //     $('#searchBox').on('input', function () {
+    //         var searchValue = $(this).val();
+    //         $.ajax({
+    //             url: 'search.php',
+    //             type: 'POST',
+    //             data: {search: searchValue},
+    //             success: function (response) {
+    //                 $('#searchRS').html(response);
+    //             }
+    //         });
+    //     });
+    // });
+
 
     page.initializeControlEvent = () => {
         /* Render action button */
@@ -757,7 +805,7 @@
         page.elements.btnShowCreateModal.on('click', () => {
             page.dialogs.elements.modalCreate.modal('show');
         })
-        page.elements.footer.on('click','.edit',function () {
+        page.elements.footer.on('click', '.edit', function () {
             customerId = $(this).data('id');
             page.commands.handleAddEventShowModalUpdate(customerId);
         })
@@ -835,8 +883,6 @@
         })
 
     }
-
-
 
 
     page.loadData = () => {

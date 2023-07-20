@@ -46,6 +46,11 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
+    public List<Customer> findCustomerByFullNameLikeAndDeletedFalse(String name) {
+        return customerRepository.findCustomerByFullNameLikeAndDeletedFalse(name);
+    }
+
+    @Override
     public List<CustomerResDTO> findAllRecipientsWithoutSenderId(Long senderId) {
         return customerRepository.findAllRecipientsWithoutSenderId(senderId);
     }
